@@ -1,0 +1,15 @@
+services:
+  local-forecast:
+    image: ghcr.io/elijaht-dev/local-forecast-engine:0.1.0
+    build: .
+    init: true
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8099:8099"
+    environment:
+      LF_RETENTION_DAYS: "90"
+      LF_THREADS: "2"
+    volumes:
+      - forecast-data:/data
+volumes:
+  forecast-data:

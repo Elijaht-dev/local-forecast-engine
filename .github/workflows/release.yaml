@@ -1,0 +1,60 @@
+name: Publish engine images
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag whose native-architecture CI has passed
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+jobs:
+  images:
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build the tagged image
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+          ARCH: ${{ matrix.arch }}
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#v}"
+          app_version="$(sed -n 's/^version: "\(.*\)"/\1/p' local_forecast/config.yaml)"
+          test "$version" = "$app_version"
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          docker build --platform "linux/$ARCH" -t "$image:$version-$ARCH" .
+          docker push "$image:$version-$ARCH"
+  manifest:
+    needs: images
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish the multi-architecture tag
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#v}"
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          docker buildx imagetools create -t "$image:$version" "$image:$version-amd64" "$image:$version-arm64"
