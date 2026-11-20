@@ -1,12 +1,12 @@
 # Local Forecast Engine
 
-Local CPU inference and history evaluation for the [Local Forecast integration](https://github.com/Elijaht-dev/local-forecast). The engine uses FastAPI and a single inference worker. The persisted SQLite queue allows HA to remain responsive while model installation and inference run.
+Run forecasts and backtests locally with Timestral, Chronos-2 or seasonal baselines. Send your time series to the standalone HTTP API, or use Forecast Lab in Home Assistant to select recorded entities. A SQLite queue stores jobs while a CPU worker runs inference.
 
 ## Home Assistant app
 
-Add this repository to **Settings → Apps → App store → Repositories**, install **Local Forecast Engine**, and start it. The app announces itself to HA with its local URL and pairing token. Install the integration separately and accept the discovery notification. The default port is internal to the Supervisor network.
+In **Settings → Apps → App store → Repositories**, add `https://github.com/Elijaht-dev/local-forecast-engine#ha-beta`, including the branch suffix. Install **Local Forecast Engine** and start it. Supervisor builds the app on the first install. Install the [Local Forecast integration](https://github.com/Elijaht-dev/local-forecast#install-the-public-beta), accept the discovered engine in **Settings → Devices & services**, and open **Forecast Lab**. The API port is internal to the Supervisor network by default.
 
-To test from source before the registry image is published, run `python scripts/package_app.py`. Extract `dist/local-forecast-app.tar.gz` into your HA OS local apps share (`/addons` from an app with the local apps mount), then reload the app store. Supervisor builds the app locally the first time you install it.
+For a manual app install, extract the released source bundle into the local apps share (`/local_apps` in Terminal & SSH on current HA OS), then reload the app store. On Raspberry Pi 4, use the built-in baselines with engine v0.1.0. [Source bundle and compatibility notes](https://github.com/Elijaht-dev/local-forecast-engine/releases/tag/v0.1.0)
 
 ## Standalone Docker
 
@@ -15,7 +15,7 @@ docker compose up --build -d
 docker compose exec local-forecast cat /data/api-token
 ```
 
-The second command displays the generated pairing token for the HA config flow. The sample Compose file binds the API to loopback. If HA is in Docker on the same machine, put both services on a shared Docker network and use the engine service's internal URL. For a separate machine, expose the port on a private interface or use an HTTPS reverse proxy and enter that URL when pairing.
+The second command displays the generated API token. Send it in the `Authorization: Bearer <token>` header when calling `/v1` endpoints, or enter it in the Home Assistant pairing form. The sample Compose file binds the API to loopback. If HA is in Docker on the same machine, put both services on a shared Docker network and use the engine service's internal URL. For a separate machine, expose the port on a private interface or use an HTTPS reverse proxy and enter that URL when pairing.
 
 The `/data` volume contains the database, installation ID, token, and model cache. Keep it across upgrades. Stop the engine before making a file-level copy. In HA OS, include the app in HA backups.
 
