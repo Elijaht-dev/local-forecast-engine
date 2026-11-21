@@ -8,6 +8,8 @@ In **Settings → Apps → App store → Repositories**, add `https://github.com
 
 For a manual app install, extract the released source bundle into the local apps share (`/local_apps` in Terminal & SSH on current HA OS), then reload the app store. On Raspberry Pi 4, use the built-in baselines with engine v0.1.0. [Source bundle and compatibility notes](https://github.com/Elijaht-dev/local-forecast-engine/releases/tag/v0.1.0)
 
+To plot a forecast on a Home Assistant dashboard, publish a project in **Forecast Lab** and select its forecast sensor in the optional **Local Forecast Card**. The card reads data through the integration. [Dashboard card and installation](https://github.com/Elijaht-dev/local-forecast-card#install-the-public-beta)
+
 ## Standalone Docker
 
 ```sh
