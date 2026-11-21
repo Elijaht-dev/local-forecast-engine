@@ -4,4 +4,6 @@ Add `https://github.com/Elijaht-dev/local-forecast-engine#ha-beta` under **Setti
 
 Install the [Local Forecast integration](https://github.com/Elijaht-dev/local-forecast/releases), restart Home Assistant and accept the discovered engine in **Settings → Devices & services**. Open **Forecast Lab** in the sidebar as an administrator.
 
+To display a forecast on a dashboard, publish a saved project in **Forecast Lab**. Install the optional **Local Forecast Card** from its custom Marketplace repository and choose the project's forecast sensor. [Dashboard card and installation](https://github.com/Elijaht-dev/local-forecast-card#install-the-public-beta)
+
 This branch packages the [v0.1.0 engine source bundle](https://github.com/Elijaht-dev/local-forecast-engine/releases/tag/v0.1.0) for the app store. On Raspberry Pi 4, use a built-in baseline with this version. See the engine release notes for the PyTorch compatibility limitation.
